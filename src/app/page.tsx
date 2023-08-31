@@ -1,95 +1,87 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import { Button, Form, Input, Select } from "antd";
+import { ALPHA_DICT, SYMBOLS } from "./constants/phrase";
+import { useEffect, useState } from "react";
+type FieldType = {
+  phrase?: string;
+  password?: string;
+  symbol?: string;
+};
 
 export default function Home() {
+  const onFinish = (formValue: FormData) => {
+    console.log("formValue", formValue);
+  };
+  const onFinishFailed = ({ values, errorFields }: any) => {
+    console.log("values", values);
+    console.log("errorFields", errorFields);
+  };
+
+  const form = Form.useFormInstance();
+
+  const formatPassword = (phrase: string) => {
+    if (!phrase || !symbol) return "";
+    let password: (string | string[])[] = [];
+    Array.from(phrase).forEach((letter: string) => {
+      if (phrase.indexOf(letter) === 0) {
+        password.push(letter.toUpperCase());
+        password.push(ALPHA_DICT[letter]);
+      } else {
+        password.push(letter);
+        password.push(ALPHA_DICT[letter]);
+      }
+    });
+    password.push(symbol);
+    return password.join("");
+  };
+
+  const [disabled, setDisabled] = useState(true);
+  const [symbol, setSymbol] = useState("!");
+
+  useEffect(() => {
+    return () => {
+      setDisabled(true);
+    };
+  }, []);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <main className="main">
+      <Form
+        form={form}
+        name="password-maker"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        layout="vertical"
+      >
+        <Form.Item<FieldType> label="Phrase" name="phrase">
+          <Input />
+        </Form.Item>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Form.Item<FieldType>
+          label="Symbol At The End"
+          name="symbol"
+          initialValue={symbol}
         >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+          <Select
+            options={SYMBOLS}
+            value={symbol}
+            onChange={(val) => setSymbol(val)}
+          />
+        </Form.Item>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+        <Form.Item<FieldType> label="Password" shouldUpdate>
+          {({ getFieldValue }) => {
+            const phrase: string = getFieldValue("phrase");
+            if (phrase) setDisabled(false);
+            const value = formatPassword(phrase);
+            return <Input.Password value={value} />;
+          }}
+        </Form.Item>
+        <Button type="primary" htmlType="submit" disabled={disabled}>
+          Copy
+        </Button>
+      </Form>
     </main>
-  )
+  );
 }
