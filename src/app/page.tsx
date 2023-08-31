@@ -10,14 +10,6 @@ type FieldType = {
 };
 
 export default function Home() {
-  const onFinish = (formValue: FormData) => {
-    console.log("formValue", formValue);
-  };
-  const onFinishFailed = ({ values, errorFields }: any) => {
-    console.log("values", values);
-    console.log("errorFields", errorFields);
-  };
-
   const form = Form.useFormInstance();
 
   const formatPassword = (phrase: string) => {
@@ -38,6 +30,7 @@ export default function Home() {
 
   const [disabled, setDisabled] = useState(true);
   const [symbol, setSymbol] = useState("!");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     return () => {
@@ -47,13 +40,7 @@ export default function Home() {
 
   return (
     <main className="main">
-      <Form
-        form={form}
-        name="password-maker"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        layout="vertical"
-      >
+      <Form form={form} name="password-maker" layout="vertical">
         <Form.Item<FieldType> label="Phrase" name="phrase">
           <Input />
         </Form.Item>
@@ -75,10 +62,15 @@ export default function Home() {
             const phrase: string = getFieldValue("phrase");
             if (phrase) setDisabled(false);
             const value = formatPassword(phrase);
+            setPassword(value);
             return <Input.Password value={value} />;
           }}
         </Form.Item>
-        <Button type="primary" htmlType="submit" disabled={disabled}>
+        <Button
+          type="primary"
+          onClick={() => navigator.clipboard.writeText(password)}
+          disabled={disabled}
+        >
           Copy
         </Button>
       </Form>
