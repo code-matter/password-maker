@@ -14,9 +14,10 @@ export default function Home() {
 
   const formatPassword = (phrase: string) => {
     if (!phrase || !symbol) return "";
+    const lowerPhrase = phrase.toLowerCase();
     let password: (string | string[])[] = [];
-    Array.from(phrase).forEach((letter: string) => {
-      if (phrase.indexOf(letter) === 0) {
+    Array.from(lowerPhrase).forEach((letter: string) => {
+      if (lowerPhrase.indexOf(letter) === 0) {
         password.push(letter.toUpperCase());
         password.push(ALPHA_DICT[letter]);
       } else {
